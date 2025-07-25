@@ -57,4 +57,91 @@
 
 // 7
 
- 
+ #include<cstdio>
+#include<cmath>
+#include<algorithm>
+#include<vector>
+using namespace std;
+
+#define sqr(x) 1LL*(x)*(x)
+#define REP(i,n) for(int i = 0, _n = (n); i < _n; ++i)
+#define TR(v,it) for(__typeof((v).begin()) it = (v).begin(), _e = (v).end(); it != _e; ++it)
+typedef long long LL;
+const static int MAX = (int)(2e5) + 1;
+
+class FenwickTree {
+    int t[MAX+1];
+
+    public:
+    FenwickTree() {
+        fill(t,t+MAX,0);
+    }
+
+    void add(int idx, int v){
+        for(; idx<=MAX; idx+=(idx+1)&-(idx+1)) t[idx]+=v;
+    }
+
+    int sum(int idx){
+        int r=0;
+        for(;idx>=0; idx-=(idx+1)&-(idx+1)) r+=t[idx];
+        return r;
+    }
+};
+
+class CPoint {
+    public:
+    int x, y, id; //x: k/c toi nha may 1, y: k/c toi nha may 2
+    CPoint(int _x, int _y, int _id): x(_x), y(_y), id(_id) {}
+    inline bool operator < (const CPoint & o) const {
+        return y < o.y || y == o.y && x < o.x || y == o.y && x == o.x && id < o.id;
+    }
+};
+
+int distance( int x, int y, int a, int b ) {
+    LL d = sqr(x-a) + sqr(y-b);
+    int res = (int) floor(sqrt(d));
+    return sqr(res) < d ? res+1 : res;
+}
+
+int countX[MAX+1], countY[MAX+1], n, q, ax, bx, ay, by, answer[MAX];
+vector<CPoint> a;
+FenwickTree bit;
+
+void enter() { //Enter and Pre-process
+    scanf("%d",&n); 
+    REP(i,n) { int x, y; scanf("%d%d",&x,&y); a.push_back(CPoint(x,y,0)); }
+    scanf("%d%d%d%d%d",&ax,&ay,&bx,&by,&q);
+    TR(a,it) {
+        int tmpx = distance(it->x, it->y, ax, ay),
+            tmpy = distance(it->x, it->y, bx, by);
+        if((it->x = tmpx) <= MAX) ++countX[tmpx];
+        if((it->y = tmpy) <= MAX) ++countY[tmpy];
+    }
+    REP(i,q) { int x,y; scanf("%d%d",&x,&y); a.push_back(CPoint(x,y,i+1)); }
+    REP(i,MAX) {
+        countX[i+1] += countX[i];
+        countY[i+1] += countY[i];
+    }
+}
+
+void solve() {
+    sort(a.begin(), a.end());
+    TR(a,it)
+        if(it->id) answer[it->id - 1] = countX[it->x] + countY[it->y] - bit.sum(it->x);
+        else bit.add(it->x, 1);
+}
+
+void print() {
+    REP(i,q) printf("%d\n", answer[i]);
+}
+
+int main() {
+#ifndef ONLINE_JUDGE
+    freopen("input.txt","r",stdin);
+    freopen("output.txt","w",stdout);
+#endif
+    enter();
+    solve();
+    print();
+    return 0;
+}
