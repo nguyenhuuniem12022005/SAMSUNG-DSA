@@ -1,136 +1,60 @@
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <algorithm>
-#include <map>
+// // SOLVE: https://oj.vnoi.info/problem/nuclear/editorial
+// Hai nhà máy điện nguyên tử sẽ được xây dựng tại Byteland trong tương lai gần. Nhà máy điện thứ nhất có bán kính nguy hiểm là R1 và nhà máy điện thứ hai có bán kính nguy hiểm là R2. Tất cả các hộ gia đình cách nhà máy thứ nhất <= R1 km hoặc cách nhà máy thứ hai <=R2 km đều đang trong tình trạng nguy hiểm. Các gia đình nằm trong khu vực nguy hiểm này sẽ bắt buộc phải di chuyển chỗ ở.
 
-const int MAX_COMPRESSED_COORD = 200005; 
-long long bit[MAX_COMPRESSED_COORD];
-int bit_size; 
+// Hai nhà máy sẽ được xây dựng cũng như các hộ gia đình đều nằm trên mặt phẳng với hệ tọa độ Descartes vuông góc Oxy , trong đó khoảng cách giữa hai điểm (x1, y1) và (x2, y2) được tính theo công thức: sqrt((x1 – x2 )^2 + (y1 – y2 )^2).
 
-void update(int idx, int val) {
-    for (; idx <= bit_size; idx += idx & (-idx)) {
-        bit[idx] += val;
-    }
-}
+// Nhiều phương án xây dựng được đưa ra với kích thước 2 nhà máy là khác nhau, gọi thông số bán kính nguy hiểm của hai nhà máy lần lượt là (R1, R2). Nhiệm vụ của bạn là xác định số lượng gia đình bắt buộc phải chuyển chỗ ở ứng với mỗi phương án.
 
-long long query(int idx) {
-    long long sum = 0;
-    for (; idx > 0; idx -= idx & (-idx)) {
-        sum += bit[idx];
-    }
-    return sum;
-}
+// Input
 
-struct Household {
-    long long d1_sq;
-    long long d2_sq;
-};
+// Dòng đầu tiên chứa số nguyên dương N là số hộ gia đình (1 <= N <= 200 000)
+// N dòng tiếp, mỗi dòng chứa hai số nguyên là tọa độ (x[i], y[i]) của một hộ gia đình
+// Dòng N+2 chứa 5 số nguyên ax, ay, bx, by và Q, lần lượt là tọa độ của nhà máy thứ nhất (ax, ay), tọa độ của nhà máy thứ hai (bx, by) và số lượng phương án Q (Q <= 200 000).
+// Q dòng tiếp theo, dòng thứ j chứa hai số nguyên R1, R2 lần lượt là bán kính nguy hiểm của nhà máy thứ nhất và bán kính nguy hiểm của nhà máy thứ hai trong phương án thứ j.
+// Tất cả tọa độ là số nguyên không âm và không lớn hơn 10^5.
+// Output
 
-struct Query {
-    long long R1_sq;
-    long long R2_sq;
-    int original_idx;
-};
+// In ra Q dòng, dòng thứ j ghi một số nguyên duy nhất là số hộ gia đình buộc phải di chuyển chỗ ở nếu đề án thứ j được thực hiện.
+// Test ví dụ:
 
-long long dist_sq(long long x1, long long y1, long long x2, long long y2) {
-    return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-}
+// Input
 
-void solve() {
-    int N;
-    std::cin >> N;
 
-    std::vector<std::pair<long long, long long>> coords(N);
-    for (int i = 0; i < N; ++i) {
-        std::cin >> coords[i].first >> coords[i].second;
-    }
 
-    long long ax, ay, bx, by;
-    int Q;
-    std::cin >> ax >> ay >> bx >> by >> Q;
+// 11
 
-    std::vector<Household> households(N);
-    std::vector<long long> all_d2_sq_values; 
+// 95 75
 
-    for (int i = 0; i < N; ++i) {
-        households[i].d1_sq = dist_sq(coords[i].first, coords[i].second, ax, ay);
-        households[i].d2_sq = dist_sq(coords[i].first, coords[i].second, bx, by);
-        all_d2_sq_values.push_back(households[i].d2_sq);
-    }
+// 27 6
 
-    std::sort(all_d2_sq_values.begin(), all_d2_sq_values.end());
-    all_d2_sq_values.erase(std::unique(all_d2_sq_values.begin(), all_d2_sq_values.end()), all_d2_sq_values.end());
-    bit_size = all_d2_sq_values.size();
+// 93 5
 
-    for (int i = 0; i <= bit_size; ++i) {
-        bit[i] = 0;
-    }
+// 124 13
 
-    std::vector<Query> queries(Q);
-    for (int i = 0; i < Q; ++i) {
-        long long R1, R2;
-        std::cin >> R1 >> R2;
-        queries[i] = {R1 * R1, R2 * R2, i};
-    }
+// 34 49
 
-    std::vector<long long> ans(Q);
-    std::vector<long long> count_A(Q);
-    std::vector<long long> count_B(Q);
-    std::vector<long long> count_A_AND_B(Q);
+// 65 61
 
-    std::vector<std::pair<long long, int>> households_sorted_by_d1(N);
-    std::vector<std::pair<long long, int>> households_sorted_by_d2(N);
-    for (int i = 0; i < N; ++i) {
-        households_sorted_by_d1[i] = {households[i].d1_sq, i};
-        households_sorted_by_d2[i] = {households[i].d2_sq, i};
-    }
-    std::sort(households_sorted_by_d1.begin(), households_sorted_by_d1.end());
-    std::sort(households_sorted_by_d2.begin(), households_sorted_by_d2.end());
+// 81 49
 
-    for (int i = 0; i < Q; ++i) {
-        count_A[queries[i].original_idx] = std::upper_bound(households_sorted_by_d1.begin(), households_sorted_by_d1.end(), std::make_pair(queries[i].R1_sq, N)) - households_sorted_by_d1.begin();
-    }
+// 77 33
 
-    for (int i = 0; i < Q; ++i) {
-        count_B[queries[i].original_idx] = std::upper_bound(households_sorted_by_d2.begin(), households_sorted_by_d2.end(), std::make_pair(queries[i].R2_sq, N)) - households_sorted_by_d2.begin();
-    }
+// 110 50
 
-    std::vector<Household> households_for_sweep = households; 
-    std::sort(households_for_sweep.begin(), households_for_sweep.end(), [](const Household& a, const Household& b) {
-        return a.d1_sq < b.d1_sq;
-    });
+// 91 22
 
-    std::sort(queries.begin(), queries.end(), [](const Query& a, const Query& b) {
-        return a.R1_sq < b.R1_sq;
-    });
+// 110 25
 
-    int household_ptr = 0;
-    for (int i = 0; i < Q; ++i) {
-        while (household_ptr < N && households_for_sweep[household_ptr].d1_sq <= queries[i].R1_sq) {
-            int compressed_d2_idx = std::upper_bound(all_d2_sq_values.begin(), all_d2_sq_values.end(), households_for_sweep[household_ptr].d2_sq) - all_d2_sq_values.begin();
-            update(compressed_d2_idx + 1, 1); 
-            household_ptr++;
-        }
-        int compressed_R2_idx = std::upper_bound(all_d2_sq_values.begin(), all_d2_sq_values.end(), queries[i].R2_sq) - all_d2_sq_values.begin();
-        count_A_AND_B[queries[i].original_idx] = query(compressed_R2_idx);
-    }
+// 57 42 97 36 2
 
-    for (int i = 0; i < Q; ++i) {
-        ans[i] = count_A[i] + count_B[i] - count_A_AND_B[i];
-        std::cout << ans[i] << "\n";
-    }
-}
+// 31 25
 
-int main() {
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(NULL);
+// 25 25
 
-    int T;
-    std::cin >> T;
-    while (T--) {
-        solve();
-    }
+ // Output
 
-    return 0;
-}
+// 7
+
+// 7
+
+ 
