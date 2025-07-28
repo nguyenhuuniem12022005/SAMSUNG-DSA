@@ -1,0 +1,1 @@
+{"name":"Local: SO-HOC-1","url":"d:\\deeplearning\\SAMSUNG\\SO-HOC-1.cpp","tests":[{"id":1753707333147,"input":"2\n4\n168","output":"2 2\n2 3\n3 1\n7 1"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\deeplearning\\SAMSUNG\\SO-HOC-1.cpp","group":"local","local":true}
