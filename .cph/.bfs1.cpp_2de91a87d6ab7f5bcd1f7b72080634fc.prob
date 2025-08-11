@@ -1,0 +1,1 @@
+{"name":"Local: bfs1","url":"d:\\deeplearning\\SAMSUNG\\bfs1.cpp","tests":[{"id":1754916671258,"input":"1 2 3 4 5 6\n4 1 2 6 5 3","output":"2"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\deeplearning\\SAMSUNG\\bfs1.cpp","group":"local","local":true}
